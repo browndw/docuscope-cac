@@ -1,5 +1,5 @@
 {
-  "name": "docuscope-ca",
+  "name": "docuscope-cac",
   "author": {
     "name": "David Brown, Suguru Ishizaki, David Kaufer",
     "email": "dwb2@andrew.cmu.edu",
@@ -12,8 +12,8 @@
   "homepage": "https://docuscope.com",
   "main": "app/main.js",
   "build": {
-    "productName": "DocuScope CA",
-    "appId": "com.docuscope-ca.app",
+    "productName": "DocuScope CAC",
+    "appId": "com.docuscope-cac.app",
     "mac": {
       "icon": "icons/icon.icns"
     },
