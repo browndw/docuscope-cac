@@ -21,11 +21,11 @@ import watchdog.observers.polling
 import altair
 import docuscospacy.corpus_analysis as ds
 import docx
-import docx.Document as Document
-import docx.opc.constants.RELATIONSHIP_TYPE as RT
-import docx.opc.part.Part as Part
-import docx.oxml.ns.qn as qn
-import docx.oxml.OxmlElement as OxmlElement
+import docx.Document
+import docx.opc.constants.RELATIONSHIP_TYPE
+import docx.opc.part.Part
+import docx.oxml.ns.qn
+import docx.oxml.OxmlElement
 import numpy
 import pandas
 import scipy

@@ -3,11 +3,7 @@ from docuscope._imports import ds
 from docuscope._imports import pandas as pd
 from docuscope._imports import altair as alt
 from docuscope._imports import components
-from docuscope._imports import Document
-from docuscope._imports import OxmlElement
-from docuscope._imports import qn
-from docuscope._imports import Part
-from docuscope._imports import RT
+from docuscope._imports import docx
 
 from collections import Counter
 import base64
@@ -68,10 +64,10 @@ def update_tags(html_state):
 def add_alt_chunk(doc: Document, html: str):
     package = doc.part.package
     partname = package.next_partname('/word/altChunk%d.html')
-    alt_part = Part(partname, 'text/html', html.encode(), package)
-    r_id = doc.part.relate_to(alt_part, RT.A_F_CHUNK)
-    alt_chunk = OxmlElement('w:altChunk')
-    alt_chunk.set(qn('r:id'), r_id)
+    alt_part = docx.opc.part.Part(partname, 'text/html', html.encode(), package)
+    r_id = doc.part.relate_to(alt_part, docx.opc.constants.RELATIONSHIP_TYPE.A_F_CHUNK)
+    alt_chunk = docx.oxml.OxmlElement('w:altChunk')
+    alt_chunk.set(docx.oxml.ns.qn('r:id'), r_id)
     doc.element.body.sectPr.addprevious(alt_chunk)
     
 CATEGORY = categories.OTHER
@@ -195,7 +191,7 @@ def main():
 					style_sheet_str = doc_html[0] + '</style>'
 					html_str = doc_html[1]
 					doc_html = '<!DOCTYPE html><html><head>' + style_sheet_str + '</head><body>' + tag_html + '<br><br>' + html_str + '</body></html>'
-					downloaded_file = Document()
+					downloaded_file = docx.Document()
 					downloaded_file.add_heading(st.session_state.doc_key)
 					downloaded_file.add_heading('Table of tag frequencies:', 3)
 					#add counts table
