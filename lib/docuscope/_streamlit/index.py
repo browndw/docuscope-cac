@@ -164,9 +164,9 @@ def main():
         simple = False
 
     if simple:
-        st.set_page_config(page_title="DocuScope CA", page_icon=FAVICON, layout="centered")
+        st.set_page_config(page_title="DocuScope CAC", page_icon=FAVICON, layout="centered")
     else:
-        st.set_page_config(page_title="DocuScope CA", page_icon=FAVICON, layout="wide")
+        st.set_page_config(page_title="DocuScope CAC", page_icon=FAVICON, layout="wide")
         local_css(STYLE)
 
     application_options = {**stable_apps}
