@@ -100,7 +100,7 @@ def update_tags(html_state):
 	style_sheet_str = '<style>' + style_str + '</style>'
 	st.session_state.html_str = style_sheet_str + html_state
 
-def add_alt_chunk(doc: Document, html: str):
+def add_alt_chunk(doc: docx.Document, html: str):
     package = doc.part.package
     partname = package.next_partname('/word/altChunk%d.html')
     alt_part = docx.opc.part.Part(partname, 'text/html', html.encode(), package)
