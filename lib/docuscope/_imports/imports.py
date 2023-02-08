@@ -21,7 +21,6 @@ import watchdog.observers.polling
 import altair
 import docuscospacy.corpus_analysis as ds
 import docx
-import docx.Document
 import docx.opc.constants.RELATIONSHIP_TYPE
 import docx.opc.part.Part
 import docx.oxml.ns.qn
