@@ -38,7 +38,7 @@ class SessionState:
 
 
 def get_session_id() -> str:
-    ctx = st.scriptrunner.add_script_run_ctx()
+    ctx = st.runtime.scriptrunner.add_script_run_ctx()
     session_id: str = ctx.streamlit_script_run_ctx.session_id
 
     return session_id
@@ -48,12 +48,13 @@ def get_session(session_id: str = None):
     if session_id is None:
         session_id = get_session_id()
 
-    session_info = st.server.server.Server.get_current()._get_session_info(session_id)
+    ctx = st.runtime.scriptrunner.get_script_run_ctx()
+    session_info = st.runtime.get_instance().get_client(ctx.session_id)
 
     if session_info is None:
         raise ValueError("No session info found")
 
-    report_session = session_info.session
+    report_session = session_info.request.headers
 
     return report_session
 
