@@ -46,6 +46,7 @@ numpy = { version = "*", optional = true }              # groups = ["user", "all
 pandas = { version = "*", optional = true }             # groups = ["user", "all"]
 python_docx = { version = "*", optional = true }        # groups = ["user", "all"]
 scikit_learn = { version = "*", optional = true }       # groups = ["user", "all"]
+scipy = { version = "*", optional = true }              # groups = ["user", "all"]
 streamlit-aggrid = { version = "*", optional = true }   # groups = ["user", "all"]
 tmtoolkit = { version = "*", optional = true }          # groups = ["user", "all"]
 Unidecode = { version = "*", optional = true }          # groups = ["user", "all"]
@@ -118,6 +119,7 @@ all = [
     "pandas",
     "python_docx",
     "scikit_learn",
+    "scipy",
     "spacy",
     "streamlit-aggrid",
     "st_aggrid",
@@ -164,6 +166,7 @@ user = [
     "pandas",
     "python_docx",
     "scikit_learn",
+    "scipy",
     "spacy",
     "streamlit-aggrid",
     "st_aggrid",
