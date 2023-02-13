@@ -201,7 +201,7 @@ def main():
 	
 		with st.sidebar.expander("Which model do I choose?"):
 			st.markdown("""
-					(For detailed descriptions, see the tags tables available from the Help menu.
+					For detailed descriptions, see the tags tables available from the Help menu.
 					But in short, the full dictionary has more categories and coverage than the common dictionary.
 					""")		
 		st.sidebar.markdown("---")
