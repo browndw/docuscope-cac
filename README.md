@@ -33,7 +33,7 @@ Current version: v0.2.1.
 
 #### Prerequisites
 
-Developing and running the ISLE Editor has the following prerequisites:
+Compiling a binary of DocuScope CAC has the following prerequisites:
 
 * [poetry][poetry]: dependency management
 * [Node.js][node-js]: JavaScript runtime
