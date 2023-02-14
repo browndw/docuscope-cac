@@ -24,10 +24,7 @@ Current version: v0.2.1.
 
 [Download DocuScope CAC for Windows (.exe)][windows]
 
-[Download DocuScope CAC for macOS with Intel (.dmg)][mac-intel]
-
-[Download DocuScope CAC for macOS with M-Series (.dmg)][mac-mseries]
-
+[Download DocuScope CAC for macOS (.dmg)][mac-intel]
 
 ### Build from Source
 
@@ -68,7 +65,6 @@ See [LICENSE][license-url].
 [node-js]: https://nodejs.org/en/
 
 [mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC-0.2.1.dmg
-[mac-mseries]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC-0.2.1-arm64.dmg
 [windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC.Setup.0.2.1.exe
 
 [license-image]: https://img.shields.io/badge/license-Apache2-blue.svg
