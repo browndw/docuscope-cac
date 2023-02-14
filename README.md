@@ -18,7 +18,7 @@ A desktop-application that processes and tags text for both parts-of-speech and 
 
 ## Installation
 
-### Binaries
+### Application (Binaries)
 
 Current version: v0.2.1.
 
