@@ -42,6 +42,11 @@ def main():
 		
 		Number of tokens in corpus: {st.session_state.tokens}\n    Number of word tokens in corpus: {st.session_state.words}\n    Number of documents in corpus: {st.session_state.ndocs}
 		""")
+
+		st.markdown(f"""##### N-grams:
+		
+		Showing n-grams with frequency > {st.session_state.min_freq}
+		""")
 			
 		gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
 		gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
@@ -145,8 +150,16 @@ def main():
 				with st.spinner('Processing ngrams...'):
 					ng_pos = ds.ngrams_table(tp, span, st.session_state.words)
 					ng_ds = ds.ngrams_table(tp, span, st.session_state.tokens, count_by='ds')
+					#cap size of dataframe
+					if len(ng_pos.index > 100000):
+						ng_pos = ng_pos.iloc[:100000]
+						min_freq = ng_pos['AF'].min()
+						ng_pos = ng_pos[(ng_pos['AF'] > min_freq)]
+						ng_ds = ng_ds[(ng_ds['AF'] > min_freq)]
+
 				st.session_state.ng_pos = ng_pos
 				st.session_state.ng_ds = ng_ds
+				st.session_state.min_freq = min_freq
 				st.experimental_rerun()
 		st.sidebar.markdown("---")
 
