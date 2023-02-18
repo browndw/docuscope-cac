@@ -131,6 +131,12 @@ def main():
 		st.sidebar.markdown("---")			
 			
 	else:
+		st.markdown("""
+		:warning: Generating n-grams can be computationally intensive. 
+		4-grams, in particular, can take roughly 1 minute to compute per 1 million words.
+		Note that depending on the size of your corpus, less frequent n-grams may be filtered.
+		""")
+
 		st.sidebar.markdown("### Span")
 		span = st.sidebar.radio('Choose the span of your n-grams.', (2, 3, 4), horizontal=True)
 		st.sidebar.markdown("---")
@@ -162,10 +168,5 @@ def main():
 				st.session_state.min_freq = min_freq
 				st.experimental_rerun()
 		st.sidebar.markdown("---")
-		st.markdown("""
-		:warning: Generating n-grams can be computationally intensive. 
-		4-grams, in particular, can take roughly 1 minute to compute per 1 million words.
-		Note that depending on the size of your corpus, less frequent n-grams may be filtered.
-		""")
 if __name__ == "__main__":
     main()
