@@ -25,7 +25,6 @@ import docx.opc.constants.RELATIONSHIP_TYPE
 import docx.opc.part.Part
 import docx.oxml.ns.qn
 import docx.oxml.OxmlElement
-import fasttext
 import numpy
 import pandas
 import scipy
