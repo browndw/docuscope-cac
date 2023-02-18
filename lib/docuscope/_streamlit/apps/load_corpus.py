@@ -54,7 +54,7 @@ def pre_process(txt):
 	txt = " ".join(txt.split())
 	return(txt)
 
-def process_corpus(corp, detect_model, nlp_model):
+def process_corpus(corp, nlp_model):
 	doc_ids = [doc.name for doc in corp]
 	doc_ids = [doc.replace(" ", "") for doc in doc_ids]
 	if len(doc_ids) > len(set(doc_ids)):
@@ -210,8 +210,7 @@ def main():
 							with st.spinner('Processing corpus data...'):
 								models = load_models()
 								nlp = models[st.session_state.model]
-								detector = load_detector()
-								ref_corp, exceptions, dup_ids = process_corpus(ref_files, detector, nlp)
+								ref_corp, exceptions, dup_ids = process_corpus(ref_files, nlp)
 							if len(exceptions) > 0 and bool(ref_corp) == False:
 								st.session_state.warning = 1
 								st.error('There was a problem proccessing your reference corpus.')
@@ -336,8 +335,7 @@ def main():
 			if st.sidebar.button("Process Corpus"):
 				with st.sidebar:
 					with st.spinner('Processing corpus data...'):
-						detector = load_detector()
-						corp, exceptions, dup_ids = process_corpus(corp_files, detector, nlp)
+						corp, exceptions, dup_ids = process_corpus(corp_files, nlp)
 					if len(exceptions) > 0 and bool(corp) == False:
 						st.session_state.warning = 1
 						st.error('There was a problem proccessing your corpus.')
