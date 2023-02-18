@@ -43,7 +43,7 @@ def warning_2(duplicates):
     '''
     return html_code
 
-@st.cache_data(show_spinner=False)
+@st.cache(show_spinner=False, allow_output_mutation=True, suppress_st_warning=True)
 def load_models():
     large_model = spacy.load(MODEL_LARGE)
     small_model = spacy.load(MODEL_SMALL)
