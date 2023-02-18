@@ -268,12 +268,12 @@ def main():
 								ref_corp, exceptions, dup_ids = process_corpus(ref_files, detector, nlp)
 							if len(exceptions) > 0 and bool(ref_corp) == False:
 								st.session_state.warning = 1
-								st.error('There was a problem proccessing your reference corpus.', icon="🚨")
+								st.error('There was a problem proccessing your reference corpus.')
 								st.experimental_rerun()
 							elif len(dup_ids) > 0 and bool(ref_corp) == False:
 								st.session_state.warning = 2
 								st.session_state.dup_ids = set(dup_ids)
-								st.error('There was a problem proccessing your reference corpus.', icon="🚨")
+								st.error('There was a problem proccessing your reference corpus.')
 								st.experimental_rerun()
 							elif len(exceptions) > 0 and bool(ref_corp) == True:
 								st.warning('There was a problem proccessing your reference corpus.')
@@ -394,12 +394,12 @@ def main():
 						corp, exceptions, dup_ids = process_corpus(corp_files, detector, nlp)
 					if len(exceptions) > 0 and bool(corp) == False:
 						st.session_state.warning = 1
-						st.error('There was a problem proccessing your corpus.', icon="🚨")
+						st.error('There was a problem proccessing your corpus.')
 						st.experimental_rerun()
 					elif len(dup_ids) > 0 and bool(corp) == False:
 						st.session_state.warning = 2
 						st.session_state.dup_ids = set(dup_ids)
-						st.error('There was a problem proccessing your corpus.', icon="🚨")
+						st.error('There was a problem proccessing your corpus.')
 						st.experimental_rerun()
 					elif len(exceptions) > 0 and bool(corp) == True:
 						st.warning('There was a problem proccessing your corpus.')
