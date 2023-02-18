@@ -7,7 +7,7 @@
   },
   "description": "A text analysis tool combining part-of-speech and rhetorical tagging",
   "licence": "Apache-2.0",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "homepage": "https://docuscope.com",
   "main": "app/main.js",
