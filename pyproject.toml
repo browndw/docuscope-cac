@@ -42,6 +42,7 @@ streamlit-ace = { version = "*", optional = true }      # groups = ["user", "all
 altair = { version = "*", optional = true }             # groups = ["user", "all"]
 docuscospacy = { version = "*", optional = true }       # groups = ["user", "all"]
 docx = { version = "*", optional = true }               # groups = ["user", "all"]
+fasttext = { version = "*", optional = true }           # groups = ["user", "all"]
 numpy = { version = "*", optional = true }              # groups = ["user", "all"]
 pandas = { version = "*", optional = true }             # groups = ["user", "all"]
 python_docx = { version = "*", optional = true }        # groups = ["user", "all"]
@@ -115,6 +116,7 @@ all = [
     "altair",
     "docuscospacy",
     "docx",
+    "fasttext",
     "numpy",
     "pandas",
     "python_docx",
@@ -162,6 +164,7 @@ user = [
     "altair",
     "docuscospacy",
     "docx",
+    "fasttext",
     "numpy",
     "pandas",
     "python_docx",
@@ -190,6 +193,7 @@ known_general_scientific = [
     "altair",
     "docuscospacy",
     "docx",
+    "fasttext",
     "numpy",
     "pandas",
     "python_docx",
