@@ -20,14 +20,11 @@ A desktop-application that processes and tags text for both parts-of-speech and 
 
 ### Application (Binaries)
 
-Current version: v0.2.1.
+Current version: v0.2.2.
 
 [Download DocuScope CAC for Windows (.exe)][windows]
 
-[Download DocuScope CAC for macOS with Intel (.dmg)][mac-intel]
-
-[Download DocuScope CAC for macOS with M-Series (.dmg)][mac-mseries]
-
+[Download DocuScope CAC for macOS (.dmg)][mac-intel]
 
 ### Build from Source
 
@@ -67,9 +64,8 @@ See [LICENSE][license-url].
 [yarn]: https://classic.yarnpkg.com/en/docs/install#debian-stable
 [node-js]: https://nodejs.org/en/
 
-[mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC-0.2.1.dmg
-[mac-mseries]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC-0.2.1-arm64.dmg
-[windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.1/DocuScope.CAC.Setup.0.2.1.exe
+[mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC-0.2.2.dmg
+[windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC.Setup.0.2.2.exe
 
 [license-image]: https://img.shields.io/badge/license-Apache2-blue.svg
 [license-url]: https://github.com/browndw/docuscope-cac/blob/main/LICENSE

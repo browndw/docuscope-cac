@@ -42,6 +42,11 @@ def main():
 		
 		Number of tokens in corpus: {st.session_state.tokens}\n    Number of word tokens in corpus: {st.session_state.words}\n    Number of documents in corpus: {st.session_state.ndocs}
 		""")
+
+		st.markdown(f"""##### N-grams:
+		
+		Showing n-grams with frequency > {st.session_state.min_freq}
+		""")
 			
 		gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
 		gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
@@ -126,6 +131,12 @@ def main():
 		st.sidebar.markdown("---")			
 			
 	else:
+		st.markdown("""
+		:warning: Generating n-grams can be computationally intensive. 
+		4-grams, in particular, can take roughly 1 minute to compute per 1 million words.
+		Note that depending on the size of your corpus, less frequent n-grams may be filtered.
+		""")
+
 		st.sidebar.markdown("### Span")
 		span = st.sidebar.radio('Choose the span of your n-grams.', (2, 3, 4), horizontal=True)
 		st.sidebar.markdown("---")
@@ -142,13 +153,20 @@ def main():
 				st.markdown(":neutral_face: It doesn't look like you've loaded a corpus yet.")
 			else:
 				tp = st.session_state.corpus
-				with st.spinner('Processing ngrams...'):
+				with st.spinner('Processing n-grams...'):
 					ng_pos = ds.ngrams_table(tp, span, st.session_state.words)
 					ng_ds = ds.ngrams_table(tp, span, st.session_state.tokens, count_by='ds')
+					#cap size of dataframe
+					if len(ng_pos.index > 100000):
+						ng_pos = ng_pos.iloc[:100000]
+						min_freq = ng_pos['AF'].min()
+						ng_pos = ng_pos[(ng_pos['AF'] > min_freq)]
+						ng_ds = ng_ds[(ng_ds['AF'] > min_freq)]
+
 				st.session_state.ng_pos = ng_pos
 				st.session_state.ng_ds = ng_ds
+				st.session_state.min_freq = min_freq
 				st.experimental_rerun()
 		st.sidebar.markdown("---")
-
 if __name__ == "__main__":
     main()
