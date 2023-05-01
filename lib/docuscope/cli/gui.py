@@ -17,7 +17,7 @@ from docuscope._gui import main
 
 def gui_cli(subparsers: argparse._SubParsersAction):
     parser: argparse.ArgumentParser = subparsers.add_parser(
-        "gui", help=("Run the PyMedPhys GUI.")
+        "gui", help=("Run the DocuScope GUI.")
     )
 
     parser.add_argument("--port")
