@@ -81,7 +81,7 @@ def run_clean_imports(_):
         subprocess.check_call([python_executable, "-m", "venv", temp_dir])
         new_python_executable = str(pathlib.Path(temp_dir).joinpath("bin", "python"))
 
-        print("Installing PyMedPhys with minimal dependencies...\n")
+        print("Installing DocuScope with minimal dependencies...\n")
         subprocess.check_call(
             [new_python_executable, "-m", "pip", "install", "."], cwd=REPO_ROOT
         )
@@ -89,7 +89,7 @@ def run_clean_imports(_):
         print("\nImporting all modules that should be able to handle a clean import...")
         _import_and_print(new_python_executable, clean_import_paths)
 
-        print("Installing PyMedPhys with tests dependencies...\n")
+        print("Installing DocuScope with tests dependencies...\n")
         subprocess.check_call(
             [new_python_executable, "-m", "pip", "install", ".[tests]"], cwd=REPO_ROOT
         )
