@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docuscope"
-version = "0.2.2-dev2"
+version = "0.2.3-dev2"
 readme = "README.md"
 description = "A text analysis tool combining part-of-speech and rhetorical tagging"
 authors = [
@@ -10,7 +10,7 @@ authors = [
 ]
 license = "Apache-2.0"
 homepage = "https://docuscope.github.io"
-repository = "https://github.com/browndw/docuscope-ca"
+repository = "https://github.com/browndw/docuscope-cac"
 documentation = "https://docuscope.github.io"
 classifiers = [
     "Development Status :: 3 - Beta",
@@ -30,16 +30,17 @@ typing-extensions = "*"
 # ------- #
 # Library #
 # ------- #
-tqdm = { version = "*", optional = true }            # groups = ["user", "all", "tests"]
-watchdog = { version = "*", optional = true }        # groups = ["user", "all"]
-python-dateutil = { version = "*", optional = true } # groups = ["user", "all", "tests"]
-tomlkit = { version = "*", optional = true }         # groups = ["user", "all", "propagate"]
-toml = { version = "*", optional = true }            # groups = ["user", "cli", "all"]
+tqdm = { version = "*", optional = true }             # groups = ["user", "all", "tests"]
+watchdog = { version = "*", optional = true }         # groups = ["user", "all"]
+python-dateutil = { version = "*", optional = true }  # groups = ["user", "all", "tests"]
+tomlkit = { version = "*", optional = true }          # groups = ["user", "all", "propagate"]
+tomli = { version = "*", optional = true }            # groups = ["user", "cli", "all"]
 
 streamlit = { version = "<1.12.0", optional = true }    # groups = ["user", "all"]
 streamlit-ace = { version = "*", optional = true }      # groups = ["user", "all"]
 
 altair = { version = "*", optional = true }             # groups = ["user", "all"]
+blosc = { version = "*", optional = true }              # groups = ["user", "all"]
 docuscospacy = { version = "*", optional = true }       # groups = ["user", "all"]
 docx = { version = "*", optional = true }               # groups = ["user", "all"]
 numpy = { version = "*", optional = true }              # groups = ["user", "all"]
@@ -48,7 +49,6 @@ python_docx = { version = "*", optional = true }        # groups = ["user", "all
 scikit_learn = { version = "*", optional = true }       # groups = ["user", "all"]
 scipy = { version = "*", optional = true }              # groups = ["user", "all"]
 streamlit-aggrid = { version = "*", optional = true }   # groups = ["user", "all"]
-tmtoolkit = { version = "*", optional = true }          # groups = ["user", "all"]
 Unidecode = { version = "*", optional = true }          # groups = ["user", "all"]
 
 # ---- #
@@ -108,11 +108,12 @@ all = [
     "streamlit",
     "streamlit-ace",
     "tabulate",
-    "toml",
+    "tomli",
     "tomlkit",
     "tqdm",
     "watchdog",
     "altair",
+    "blosc",
     "docuscospacy",
     "docx",
     "numpy",
@@ -123,11 +124,10 @@ all = [
     "spacy",
     "streamlit-aggrid",
     "st_aggrid",
-    "tmtoolkit",
     "Unidecode",
 ]
 build = ["pyoxidizer"]
-cli = ["toml"]
+cli = ["tomli"]
 dev = [
     "black",
     "doc8",
@@ -155,11 +155,12 @@ user = [
     "pywin32",
     "streamlit",
     "streamlit-ace",
-    "toml",
+    "tomli",
     "tomlkit",
     "tqdm",
     "watchdog",
     "altair",
+    "blosc",
     "docuscospacy",
     "docx",
     "numpy",
@@ -170,7 +171,6 @@ user = [
     "spacy",
     "streamlit-aggrid",
     "st_aggrid",
-    "tmtoolkit",
     "Unidecode",
 ]
 
@@ -188,6 +188,7 @@ ensure_newline_before_comments = true
 known_third_party = ["docuscope._imports"]
 known_general_scientific = [
     "altair",
+    "blosc",
     "docuscospacy",
     "docx",
     "fasttext",
@@ -196,7 +197,6 @@ known_general_scientific = [
     "python_docx",
     "scikit_learn",
     "streamlit-aggrid",
-    "tmtoolkit",
     "Unidecode",
 ]
 known_machine_learning = [
