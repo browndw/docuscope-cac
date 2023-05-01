@@ -13,7 +13,7 @@
 
 import pathlib
 
-from docuscope._imports import toml
+from docuscope._imports import tomli
 
 is_cli = False
 
@@ -34,8 +34,8 @@ def get_config(path=None):
     config_path = path.joinpath("config.toml")
 
     while True:
-        with open(config_path, "r") as f:
-            results = toml.load(f)
+        with open(config_path, "rb") as f:
+            results = tomli.load(f)
 
         try:
             config_path = pathlib.Path(results["redirect"])
