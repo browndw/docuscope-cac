@@ -249,7 +249,7 @@ def AliasModule(modname, modpath, attrname=None):
                     f"""
                     PyMedPhys was unable to import "{no_scope_modname}.{name}".
                     The easiest way to fix this issue is to use the "[user]"
-                    option when installing PyMedPhys. For example,
+                    option when installing DocuScope. For example,
                     with pip this can be done by calling
                     "pip install docuscope[user]=={__version__}".
                     """
