@@ -30,7 +30,7 @@ Handlers = Dict[str, Tuple[Any, Dict[str, Any]]]
 
 
 def apply_streamlit_server_patches():
-    """Apply the PyMedPhys streamlit server extensions.
+    """Apply the DocuScope streamlit server extensions.
 
     Must be run after Streamlit configuration has been set, but before
     the server starts.
