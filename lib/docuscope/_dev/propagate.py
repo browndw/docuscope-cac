@@ -30,7 +30,7 @@ PYPROJECT_TOML_HASH_PATH = REPO_ROOT.joinpath("pyproject.hash")
 VERSION_PATH = LIBRARY_PATH.joinpath("_version.py")
 
 REQUIREMENTS_CONFIG = (
-    # Extras | Filename | Include PyMedPhys | Make it an editable dev install
+    # Extras | Filename | Include DocuScope | Make it an editable dev install
     (["user"], "requirements.txt", True, False),
     (["all"], "requirements-all.txt", True, True),
     (["user", "tests"], "requirements-deploy.txt", False, None),
