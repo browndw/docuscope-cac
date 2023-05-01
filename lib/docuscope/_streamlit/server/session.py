@@ -1,4 +1,4 @@
-# Copyright (C) 2020 Simon Biggs
+# Copyright (C) 2023 David West Brown
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-# It is understood that we are stepping into 'private' API usage here
-# pylint: disable = protected-access
-
 import pathlib
 from typing import BinaryIO, Union
+from importlib.machinery import SourceFileLoader
 
-from docuscope._imports import streamlit as st
+# set paths
+HERE = pathlib.Path(__file__).parents[1].resolve()
+OPTIONS = str(HERE.joinpath("options.toml"))
+IMPORTS = str(HERE.joinpath("utilities/handlers_imports.py"))
+
+# import options
+_imports = SourceFileLoader("handlers_imports", IMPORTS).load_module()
+_options = _imports.import_options_general(OPTIONS)
+
+modules = ['streamlit']
+import_params = _imports.import_parameters(_options, modules)
+
+for module in import_params.keys():
+	object_name = module
+	short_name = import_params[module][0]
+	context_module_name = import_params[module][1]
+	if not short_name:
+		short_name = object_name
+	if not context_module_name:
+		globals()[short_name] = __import__(object_name)
+	else:
+		context_module = __import__(context_module_name, fromlist=[object_name])
+		globals()[short_name] = getattr(context_module, object_name)
+
 
 File = Union[pathlib.Path, str, BinaryIO]
 
