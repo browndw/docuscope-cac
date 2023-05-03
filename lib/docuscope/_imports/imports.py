@@ -19,7 +19,6 @@ import watchdog.observers
 import watchdog.observers.polling
 
 import altair
-import blosc
 import docuscospacy.corpus_analysis as ds
 import docuscospacy.corpus_utils as corpus_utils
 import docx
