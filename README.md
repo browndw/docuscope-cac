@@ -64,8 +64,8 @@ See [LICENSE][license-url].
 [yarn]: https://classic.yarnpkg.com/en/docs/install#debian-stable
 [node-js]: https://nodejs.org/en/
 
-[mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC-0.2.2.dmg
-[windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC.Setup.0.2.2.exe
+[mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC-0.2.3.dmg
+[windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.2.2/DocuScope.CAC.Setup.0.2.3.exe
 
 [license-image]: https://img.shields.io/badge/license-Apache2-blue.svg
 [license-url]: https://github.com/browndw/docuscope-cac/blob/main/LICENSE
