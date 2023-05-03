@@ -40,7 +40,6 @@ streamlit = { version = "<1.12.0", optional = true }    # groups = ["user", "all
 streamlit-ace = { version = "*", optional = true }      # groups = ["user", "all"]
 
 altair = { version = "*", optional = true }             # groups = ["user", "all"]
-blosc = { version = "*", optional = true }              # groups = ["user", "all"]
 docuscospacy = { version = "*", optional = true }       # groups = ["user", "all"]
 docx = { version = "*", optional = true }               # groups = ["user", "all"]
 numpy = { version = "*", optional = true }              # groups = ["user", "all"]
@@ -113,7 +112,6 @@ all = [
     "tqdm",
     "watchdog",
     "altair",
-    "blosc",
     "docuscospacy",
     "docx",
     "numpy",
@@ -160,7 +158,6 @@ user = [
     "tqdm",
     "watchdog",
     "altair",
-    "blosc",
     "docuscospacy",
     "docx",
     "numpy",
@@ -188,7 +185,6 @@ ensure_newline_before_comments = true
 known_third_party = ["docuscope._imports"]
 known_general_scientific = [
     "altair",
-    "blosc",
     "docuscospacy",
     "docx",
     "fasttext",
