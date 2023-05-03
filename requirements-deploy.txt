@@ -1,6 +1,5 @@
 altair==4.2.0 ; python_version >= "3.8" and python_version < "3.11"
 astroid==2.12.12 ; python_version >= "3.8" and python_version < "3.11"
-blosc==1.11.1 ; python_version >= "3.8" and python_version < "3.11"
 docuscospacy==0.2.3 ; python_version >= "3.8" and python_version < "3.11"
 docx==0.2.4 ; python_version >= "3.8" and python_version < "3.11"
 hypothesis==5.49.0 ; python_version >= "3.8" and python_version < "3.11"
