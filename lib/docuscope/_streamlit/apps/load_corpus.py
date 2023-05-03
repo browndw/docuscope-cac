@@ -87,9 +87,10 @@ def main():
 			
 	if 'warning' not in st.session_state:
 		st.session_state['warning'] = 0
-
+	
 	if session.get('target_path') is not None:
 		metadata_target = _handlers.load_metadata('target')
+
 		if session.get('has_reference') == True:
 			metadata_reference = _handlers.load_metadata('reference')
 		
@@ -132,15 +133,17 @@ def main():
 				if save_target == 'Yes':
 					target_name = st.text_input("Name your target corpus (only letters, numbers, the hyphen or the underscore are allowed):")
 					if st.button("Save Corpus"):
-						if len(target_name) > 2 & len(target_name) < 15 and _handlers.check_name(target_name) == True:
-							corp = _handlers.load_temp('target')
-							tags_pos, tags_ds = _process.get_corpus_features(corp)
-							model = _process.check_model(tags_ds)
-							_handlers.save_corpus(corp, model, target_name)
-							_handlers.update_session('is_saved', 'Yes')
-							st.experimental_rerun()
-						else:
-							st.markdown(_warnings.warning_10, unsafe_allow_html=True)
+						with st.spinner('Saving corpus...'):
+							if len(target_name) > 2 & len(target_name) < 15 and _handlers.check_name(target_name) == True:
+								corp = _handlers.load_temp('target')
+								tags_pos, tags_ds = _process.get_corpus_features(corp)
+								model = _process.check_model(tags_ds)
+								_handlers.save_corpus(corp, model, target_name)
+								_handlers.update_session('is_saved', 'Yes')
+								st.success('Corpus saved!')
+								st.experimental_rerun()
+							else:
+								st.markdown(_warnings.warning_10, unsafe_allow_html=True)
 		
 		if session.get('has_reference') == True:
 			metadata_reference = _handlers.load_metadata('reference')
