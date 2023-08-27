@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docuscope"
-version = "0.2.3-dev2"
+version = "0.2.4-dev2"
 readme = "README.md"
 description = "A text analysis tool combining part-of-speech and rhetorical tagging"
 authors = [
