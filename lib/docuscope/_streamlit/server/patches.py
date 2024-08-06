@@ -1,4 +1,5 @@
-# Copyright (C) 2021 Simon Biggs, Cancer Care Associates
+# Copyright (C) 2024 David West Brown
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -42,17 +43,17 @@ def _monkey_patch_streamlit_server():
     """Adds custom URL routes to Streamlit's tornado server."""
     handlers = _create_handlers()
 
-    OfficialServer = st.server.server.Server
+    OfficialServer = st.web.server.server.Server
     official_create_app = OfficialServer._create_app
 
-    def patched_create_app(self: st.server.server.Server) -> tornado.web.Application:
+    def patched_create_app(self: st.web.server.server.Server) -> tornado.web.Application:
         app: tornado.web.Application = official_create_app(self)
 
         base: str = st.config.get_option("server.baseUrlPath")
 
         rules: tornado.routing._RuleList = []
         for key, (handler, kwargs) in handlers.items():
-            pattern = st.server.server_util.make_url_path_regex(base, key)
+            pattern = st.web.server.server_util.make_url_path_regex(base, key)
             rules.append((pattern, handler, kwargs))
 
         app.add_handlers(".*", rules)
