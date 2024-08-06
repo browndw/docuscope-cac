@@ -18,6 +18,7 @@ import shutil
 import sys
 
 from docuscope._imports import streamlit as st
+from docuscope._imports import bootstrap
 
 from docuscope._streamlit.server import start
 
@@ -44,7 +45,7 @@ def main(args):
 
 
 def _patch_streamlit_print_url():
-    _original_print_url = st.bootstrap._print_url
+    _original_print_url = bootstrap._print_url
 
     def _new_print_url(is_running_hello: bool) -> None:
         port = int(st.config.get_option("browser.serverPort"))
@@ -55,7 +56,7 @@ def _patch_streamlit_print_url():
 
         _original_print_url(is_running_hello)
 
-    st.bootstrap._print_url = _new_print_url
+    bootstrap._print_url = _new_print_url
 
 
 def _fill_streamlit_credentials():
