@@ -1,6 +1,6 @@
 [global]
-check_size = true
-check_language = true
+check_size = false
+check_language = false
 enable_save = true
 desktop_mode = true
 max_bytes_text = 20000000
