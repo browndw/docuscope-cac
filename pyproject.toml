@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docuscope"
-version = "0.2.4-dev2"
+version = "0.3.0-dev2"
 readme = "README.md"
 description = "A text analysis tool combining part-of-speech and rhetorical tagging"
 authors = [
@@ -23,7 +23,7 @@ classifiers = [
 packages = [{ include = "docuscope", from = "lib" }]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.11"
+python = ">=3.10,<3.11"
 typing-extensions = "*"
 
 
@@ -36,19 +36,22 @@ python-dateutil = { version = "*", optional = true }  # groups = ["user", "all",
 tomlkit = { version = "*", optional = true }          # groups = ["user", "all", "propagate"]
 tomli = { version = "*", optional = true }            # groups = ["user", "cli", "all"]
 
-streamlit = { version = "<1.12.0", optional = true }    # groups = ["user", "all"]
-streamlit-ace = { version = "*", optional = true }      # groups = ["user", "all"]
+streamlit = { version = "*", optional = true }        # groups = ["user", "all"]
+streamlit-ace = { version = "*", optional = true }    # groups = ["user", "all"]
 
-altair = { version = "*", optional = true }             # groups = ["user", "all"]
-docuscospacy = { version = "*", optional = true }       # groups = ["user", "all"]
-docx = { version = "*", optional = true }               # groups = ["user", "all"]
-numpy = { version = "*", optional = true }              # groups = ["user", "all"]
-pandas = { version = "*", optional = true }             # groups = ["user", "all"]
-python_docx = { version = "*", optional = true }        # groups = ["user", "all"]
-scikit_learn = { version = "*", optional = true }       # groups = ["user", "all"]
-scipy = { version = "*", optional = true }              # groups = ["user", "all"]
-streamlit-aggrid = { version = "*", optional = true }   # groups = ["user", "all"]
-Unidecode = { version = "*", optional = true }          # groups = ["user", "all"]
+altair = { version = "*", optional = true }                  # groups = ["user", "all"]
+docx = { version = "*", optional = true }                    # groups = ["user", "all"]
+ibis-framework = { version = "*", optional = true }          # groups = ["user", "all"]
+lingua-language-detector = { version = "*", optional = true }          # groups = ["user", "all"]
+numpy = { version = "*", optional = true }                   # groups = ["user", "all"]
+polars = { version = "*", optional = true }                  # groups = ["user", "all"]
+pandas = { version = "*", optional = true }                  # groups = ["user", "all"]
+python_docx = { version = "*", optional = true }             # groups = ["user", "all"]
+scikit_learn = { version = "*", optional = true }            # groups = ["user", "all"]
+scipy = { version = "*", optional = true }                   # groups = ["user", "all"]
+streamlit-aggrid = { version = "*", optional = true }        # groups = ["user", "all"]
+Unidecode = { version = "*", optional = true }               # groups = ["user", "all"]
+XlsxWriter = { version = "*", optional = true }              # groups = ["user", "all"]
 
 # ---- #
 # CVEs #
@@ -112,10 +115,12 @@ all = [
     "tqdm",
     "watchdog",
     "altair",
-    "docuscospacy",
     "docx",
+    "ibis-framework",
+    "lingua-language-detector",
     "numpy",
     "pandas",
+    "polars",
     "python_docx",
     "scikit_learn",
     "scipy",
@@ -123,6 +128,7 @@ all = [
     "streamlit-aggrid",
     "st_aggrid",
     "Unidecode",
+    "XlsxWriter",
 ]
 build = ["pyoxidizer"]
 cli = ["tomli"]
@@ -158,10 +164,12 @@ user = [
     "tqdm",
     "watchdog",
     "altair",
-    "docuscospacy",
     "docx",
+    "ibis-framework",
+    "lingua-language-detector",
     "numpy",
     "pandas",
+    "polars",
     "python_docx",
     "scikit_learn",
     "scipy",
@@ -169,6 +177,7 @@ user = [
     "streamlit-aggrid",
     "st_aggrid",
     "Unidecode",
+    "XlsxWriter",
 ]
 
 [tool.poetry.scripts]
@@ -185,11 +194,10 @@ ensure_newline_before_comments = true
 known_third_party = ["docuscope._imports"]
 known_general_scientific = [
     "altair",
-    "docuscospacy",
     "docx",
-    "fasttext",
     "numpy",
     "pandas",
+    "polars",
     "python_docx",
     "scikit_learn",
     "streamlit-aggrid",
