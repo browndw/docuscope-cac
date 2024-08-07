@@ -40,6 +40,8 @@ def main(args):
     if args.electron:
         _patch_streamlit_print_url()
         config["server.headless"] = True
+        config["server.enableXsrfProtection"] = False
+        config["server.enableCORS"] = False
 
     start.start_streamlit_server(streamlit_script_path, config)
 
