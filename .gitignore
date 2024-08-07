@@ -3,8 +3,8 @@
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
+#*.py[cod]
+#*$py.class
 
 # C extensions
 *.so
@@ -89,7 +89,7 @@ ipython_config.py
 #Pipfile.lock
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
-#__pypackages__/
+__pypackages__/
 
 # Celery stuff
 celerybeat-schedule
