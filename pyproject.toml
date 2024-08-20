@@ -23,7 +23,7 @@ classifiers = [
 packages = [{ include = "docuscope", from = "lib" }]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.10,<3.13"
 typing-extensions = "*"
 
 
