@@ -20,7 +20,7 @@ A desktop-application that processes and tags text for both parts-of-speech and 
 
 ### Application (Binaries)
 
-Current version: v0.2.4.
+Current version: v0.3.1.
 
 [Download DocuScope CAC for Windows (.exe)][windows]
 
