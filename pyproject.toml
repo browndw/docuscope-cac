@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docuscope"
-version = "0.3.0-dev2"
+version = "0.3.1-dev2"
 readme = "README.md"
 description = "A text analysis tool combining part-of-speech and rhetorical tagging"
 authors = [
@@ -41,7 +41,6 @@ streamlit-ace = { version = "*", optional = true }    # groups = ["user", "all"]
 
 altair = { version = "*", optional = true }                  # groups = ["user", "all"]
 docx = { version = "*", optional = true }                    # groups = ["user", "all"]
-ibis-framework = { version = "*", optional = true }          # groups = ["user", "all"]
 lingua-language-detector = { version = "*", optional = true }          # groups = ["user", "all"]
 numpy = { version = "*", optional = true }                   # groups = ["user", "all"]
 polars = { version = "*", optional = true }                  # groups = ["user", "all"]
@@ -49,7 +48,6 @@ pandas = { version = "*", optional = true }                  # groups = ["user",
 python_docx = { version = "*", optional = true }             # groups = ["user", "all"]
 scikit_learn = { version = "*", optional = true }            # groups = ["user", "all"]
 scipy = { version = "*", optional = true }                   # groups = ["user", "all"]
-streamlit-aggrid = { version = "*", optional = true }        # groups = ["user", "all"]
 Unidecode = { version = "*", optional = true }               # groups = ["user", "all"]
 XlsxWriter = { version = "*", optional = true }              # groups = ["user", "all"]
 
@@ -116,7 +114,6 @@ all = [
     "watchdog",
     "altair",
     "docx",
-    "ibis-framework",
     "lingua-language-detector",
     "numpy",
     "pandas",
@@ -125,8 +122,6 @@ all = [
     "scikit_learn",
     "scipy",
     "spacy",
-    "streamlit-aggrid",
-    "st_aggrid",
     "Unidecode",
     "XlsxWriter",
 ]
@@ -165,7 +160,6 @@ user = [
     "watchdog",
     "altair",
     "docx",
-    "ibis-framework",
     "lingua-language-detector",
     "numpy",
     "pandas",
@@ -174,8 +168,6 @@ user = [
     "scikit_learn",
     "scipy",
     "spacy",
-    "streamlit-aggrid",
-    "st_aggrid",
     "Unidecode",
     "XlsxWriter",
 ]
@@ -200,7 +192,6 @@ known_general_scientific = [
     "polars",
     "python_docx",
     "scikit_learn",
-    "streamlit-aggrid",
     "Unidecode",
 ]
 known_machine_learning = [

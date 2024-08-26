@@ -16,7 +16,6 @@ import polars as pl
 import streamlit as st
 
 from docuscope._streamlit import categories as _categories
-from docuscope._streamlit import states as _states
 from docuscope._streamlit.utilities import handlers_database as _handlers
 from docuscope._streamlit.utilities import messages as _messages
 	
@@ -31,17 +30,12 @@ def main():
 
 	if user_session_id not in st.session_state:
 		st.session_state[user_session_id] = {}
-	try:
-		con = st.session_state[user_session_id]["ibis_conn"]
-	except:
-		con = _handlers.get_db_connection(user_session_id)
-		_handlers.generate_temp(_states.STATES.items(), user_session_id, con)
 
 	try:
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 	except:
-		_handlers.init_session(con)
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
+		_handlers.init_session(user_session_id)
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 
 	st.markdown(_messages.message_download_tagged)
 	
@@ -54,8 +48,7 @@ def main():
 		tagset = 'ds'
 
 	if session.get('has_target')[0] == True:
-		tok_pl = con.table("ds_tokens", database="target").to_pyarrow_batches(chunk_size=5000)
-		tok_pl = pl.from_arrow(tok_pl)
+		tok_pl = st.session_state[user_session_id]["target"]["ds_tokens"]
 
 		with st.sidebar:
 			download_file = _handlers.convert_to_zip(tok_pl, tagset)

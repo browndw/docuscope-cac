@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
 import polars as pl
-import st_aggrid
 import streamlit as st
 
 from docuscope._streamlit import categories as _categories
-from docuscope._streamlit import states as _states
 from docuscope._streamlit.utilities import analysis_functions as _analysis
 from docuscope._streamlit.utilities import handlers_database as _handlers
 from docuscope._streamlit.utilities import messages as _messages
@@ -36,88 +33,59 @@ def main():
 	if user_session_id not in st.session_state:
 		st.session_state[user_session_id] = {}
 	try:
-		con = st.session_state[user_session_id]["ibis_conn"]
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 	except:
-		con = _handlers.get_db_connection(user_session_id)
-		_handlers.generate_temp(_states.STATES.items(), user_session_id, con)
-
-	try:
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
-	except:
-		_handlers.init_session(con)
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
+		_handlers.init_session(user_session_id)
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 
 	if session.get('collocations')[0] == True:
 		
-		metadata_target = _handlers.load_metadata('target', con)
+		metadata_target = _handlers.load_metadata('target', user_session_id)
 
-		df = con.table("collocations", database="target").to_pyarrow_batches(chunk_size=5000)
-		df = pl.from_arrow(df).to_pandas()
+		df = st.session_state[user_session_id]["target"]["collocations"]
 		
 		col1, col2 = st.columns([1,1])
 		with col1:
 			st.markdown(_messages.message_target_info(metadata_target))
 		with col2:
 			st.markdown(_messages.message_collocation_info(metadata_target.get('collocations')[0]['temp']))
-			
-		gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
-		gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
-		gb.configure_default_column(filter="agTextColumnFilter")
-		gb.configure_column("Token", filter="agTextColumnFilter", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly = True)
-		gb.configure_column("MI", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=3)
-		gb.configure_selection('multiple', use_checkbox=True, groupSelectsChildren="Group checkbox select children") #Enable multi-row selection
-		gb.configure_grid_options(sideBar = {"toolPanels": ['filters']})
-		go = gb.build()
 	
-		grid_response = st_aggrid.AgGrid(
-			df,
-			gridOptions=go,
-			enable_enterprise_modules = False,
-			data_return_mode='FILTERED_AND_SORTED', 
-			update_mode='MODEL_CHANGED', 
-			columns_auto_size_mode='FIT_CONTENTS',
-			theme='alpine',
-			height=500, 
-			width='100%',
-			reload_data=False
-			)
-		
-		with st.expander("Column explanation"):
-			st.markdown(_messages.message_columns_collocations)
-	
-		selected = grid_response['selected_rows']
+		if df.height == 0 or df is None:
+			cats = []
+		elif df.height > 0:
+			cats = sorted(df.get_column("Tag").unique().to_list())
 
-		if selected is not None:
-			df = pd.DataFrame(selected)
-			n_selected = len(df.index)
-			st.markdown(f"""##### Selected rows:
-			   
-			Number of selected tokens: {n_selected}
-			""")
-		
-		with st.sidebar.expander("Filtering and saving"):
-			st.markdown(_messages.message_filters)
-		
-		with st.sidebar:
-			st.markdown(_messages.message_download)
-			download_file = _handlers.convert_to_excel(df)
+		filter_vals = st.multiselect("Select tags to filter:", (cats))
+		if len(filter_vals) > 0:
+			df = df.filter(pl.col("Tag").is_in(filter_vals))
 
-			st.download_button(
-    			label="Download to Excel",
-    			data=download_file,
-    			file_name="collocations.xlsx",
-   					 mime="application/vnd.ms-excel",
-					)
+		st.dataframe(df, hide_index=True, 
+				column_config={
+					"Range": st.column_config.NumberColumn(format="%.2f %%"),
+					"RF": st.column_config.NumberColumn(format="%.2f")}
+		)
+		
+		download_table = st.sidebar.toggle("Download to Excel?")
+		if download_table == True:
+			with st.sidebar:
+				st.markdown(_messages.message_download)
+				download_file = _handlers.convert_to_excel(df.to_pandas())
+
+				st.download_button(
+					label="Download to Excel",
+					data=download_file,
+					file_name="collocations.xlsx",
+						mime="application/vnd.ms-excel",
+						)
 		st.sidebar.markdown("---")
 
 		st.sidebar.markdown(_messages.message_reset_table)
 		
 		if st.sidebar.button("Create New Collocations Table"):
-			try:
-				con.drop_table("collocations", database="target")
-			except:
-				pass
-			_handlers.update_session('collocations', False, con)
+			if "collocations" not in st.session_state[user_session_id]["target"]:
+				st.session_state[user_session_id]["target"]["collocations"] = {}
+			st.session_state[user_session_id]["target"]["collocations"] = {}
+			_handlers.update_session('collocations', False, user_session_id)
 			st.rerun()
 		st.sidebar.markdown("---")
 				
@@ -126,7 +94,7 @@ def main():
 		st.markdown(_messages.message_collocations)
 
 		if session.get("has_target")[0] == True:
-			metadata_target = _handlers.load_metadata('target', con)
+			metadata_target = _handlers.load_metadata('target', user_session_id)
 
 		st.sidebar.markdown("### Node word")
 		st.sidebar.markdown("""Enter a node word without spaces.
@@ -210,8 +178,7 @@ def main():
 			else:
 				with st.sidebar:
 					with st.spinner('Processing collocates...'):
-						tok_pl = con.table("ds_tokens", database="target").to_pyarrow_batches(chunk_size=5000)
-						tok_pl = pl.from_arrow(tok_pl)
+						tok_pl = st.session_state[user_session_id]["target"]["ds_tokens"]
 
 						coll_df = _analysis.collocations_pl(tok_pl, node_word=node_word, node_tag=node_tag, preceding=to_left, following=to_right, statistic=stat_mode, count_by=count_by)
 				
@@ -219,9 +186,11 @@ def main():
 					st.markdown(_warnings.warning_12, unsafe_allow_html=True)
 					
 				else:
-					con.create_table("collocations", obj=coll_df, database="target", overwrite=True)
-					_handlers.update_session('collocations', True, con)
-					_handlers.update_metadata('target', key='collocations', value=[node_word, stat_mode, str(to_left), str(to_right)], ibis_conn=con)
+					if "collocations" not in st.session_state[user_session_id]["target"]:
+						st.session_state[user_session_id]["target"]["collocations"] = {}
+					st.session_state[user_session_id]["target"]["collocations"] = coll_df
+					_handlers.update_session('collocations', True, user_session_id)
+					_handlers.update_metadata('target', key='collocations', value=[node_word, stat_mode, str(to_left), str(to_right)], session_id=user_session_id)
 					st.rerun()
 
 	

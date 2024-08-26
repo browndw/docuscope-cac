@@ -13,15 +13,12 @@
 # limitations under the License.
 
 import altair as alt
-import ibis
 import pandas as pd
 import pathlib
 import polars as pl
-import st_aggrid
 import streamlit as st
 
 from docuscope._streamlit import categories as _categories
-from docuscope._streamlit import states as _states
 from docuscope._streamlit.utilities import analysis_functions as _analysis
 from docuscope._streamlit.utilities import handlers_database as _handlers
 from docuscope._streamlit.utilities import messages as _messages
@@ -39,99 +36,75 @@ def main():
 	if user_session_id not in st.session_state:
 		st.session_state[user_session_id] = {}
 	try:
-		con = st.session_state[user_session_id]["ibis_conn"]
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 	except:
-		con = _handlers.get_db_connection(user_session_id)
-		_handlers.generate_temp(_states.STATES.items(), user_session_id, con)
-
-	try:
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
-	except:
-		_handlers.init_session(con)
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
+		_handlers.init_session(user_session_id)
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 
 	if session.get('keyness_table')[0] == True:
 	
 		_handlers.load_widget_state(pathlib.Path(__file__).stem, user_session_id)
-		metadata_target = _handlers.load_metadata('target', con)
-		metadata_reference = _handlers.load_metadata('reference', con)
+		metadata_target = _handlers.load_metadata('target', user_session_id)
+		metadata_reference = _handlers.load_metadata('reference', user_session_id)
 
+
+		col1, col2 = st.columns([1,1])
+		with col1:
+			st.markdown(_messages.message_target_info(metadata_target))
+		with col2:
+			st.markdown(_messages.message_reference_info(metadata_reference))
+		
+		st.markdown("Showing keywords that reach significance at *p* < 0.01")
+		
 		st.sidebar.markdown("### Comparison")	
 		table_radio = st.sidebar.radio("Select the keyness table to display:", ("Tokens", "Tags Only"), key = _handlers.persist("kt_radio1", pathlib.Path(__file__).stem, user_session_id), horizontal=True)
+		st.sidebar.markdown("---")
 		if table_radio == 'Tokens':
-			st.sidebar.markdown("---")
-			st.sidebar.markdown("### Tagset")
-			tag_radio_tokens = st.sidebar.radio("Select tags to display:", ("Parts-of-Speech", "DocuScope"), key = _handlers.persist("kt_radio2", pathlib.Path(__file__).stem,  user_session_id), horizontal=True)
-	
-			if tag_radio_tokens == 'Parts-of-Speech':
-				df = con.table("kw_pos", database="target").to_pyarrow_batches(chunk_size=5000)
-				df = pl.from_arrow(df).to_pandas()
-			else:
-				df = con.table("kw_ds", database="target").to_pyarrow_batches(chunk_size=5000)
-				df = pl.from_arrow(df).to_pandas()
+			tag_radio = st.sidebar.radio("Select tags to display:", ("Parts-of-Speech", "DocuScope"), key = _handlers.persist("kt_radio2", pathlib.Path(__file__).stem, user_session_id), horizontal=True)
+			if tag_radio == 'Parts-of-Speech':
+				tag_type = st.sidebar.radio("Select from general or specific tags", ("General", "Specific"), horizontal=True)			
+				if tag_type == 'General':
+					df = st.session_state[user_session_id]["target"]["kw_pos"]
+					df = _analysis.freq_simplify_pl(df)
+				else:
+					df = st.session_state[user_session_id]["target"]["kw_pos"]
+			else:			
+				df = st.session_state[user_session_id]["target"]["kw_ds"]
 			
-			col1, col2 = st.columns([1,1])
-			with col1:
-				st.markdown(_messages.message_target_info(metadata_target))
-			with col2:
-				st.markdown(_messages.message_reference_info(metadata_reference))	
-		
-			gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
-			gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
-			gb.configure_column("Token", filter="agTextColumnFilter", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly = True)
-			gb.configure_column("Tag", filter="agTextColumnFilter")
-			gb.configure_column("LL", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("LR", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=3)
-			gb.configure_column("PV", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=4)
-			gb.configure_column("RF", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("Range", type=["numericColumn","numberColumnFilter"], valueFormatter="(data.Range).toFixed(1)+'%'")
-			gb.configure_column("RF_Ref", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("Range_Ref", type=["numericColumn","numberColumnFilter"], valueFormatter="(data.Range_Ref).toFixed(1)+'%'")
-			gb.configure_selection('multiple', use_checkbox=True, groupSelectsChildren="Group checkbox select children") #Enable multi-row selection
-			gb.configure_grid_options(sideBar = {"toolPanels": ['filters']})
-			go = gb.build()
-	
-			grid_response = st_aggrid.AgGrid(
-				df,
-				gridOptions=go,
-				enable_enterprise_modules = False,
-				data_return_mode='FILTERED_AND_SORTED', 
-				update_mode='MODEL_CHANGED', 
-				columns_auto_size_mode='FIT_CONTENTS',
-				theme='alpine',
-				height=500, 
-				width='100%',
-				reload_data=False
-				)
-		
+			if df.height == 0 or df is None:
+				cats = []
+			elif df.height > 0:
+				cats = sorted(df.get_column("Tag").unique().to_list())
+
+			filter_vals = st.multiselect("Select tags to filter:", (cats))
+			if len(filter_vals) > 0:
+				df = df.filter(pl.col("Tag").is_in(filter_vals))
+
+			st.dataframe(df, hide_index=True, 
+					column_config={
+						"Range": st.column_config.NumberColumn(format="%.2f %%"),
+						"Range_Ref": st.column_config.NumberColumn(format="%.2f %%"),
+						"RF_Ref": st.column_config.NumberColumn(format="%.2f"),
+						"RF": st.column_config.NumberColumn(format="%.2f")}
+			)
+			
 			with st.expander("Column explanation"):
 				st.markdown(_messages.message_columns_keyness)
-				
-			selected = grid_response['selected_rows']
-
-			if selected is not None:
-				df = pd.DataFrame(selected)
-				n_selected = len(df.index)
-				st.markdown(f"""##### Selected rows:
-				
-				Number of selected tokens: {n_selected}
-				""")
-			
+							
 			st.sidebar.markdown("---")
 
-			with st.sidebar.expander("Filtering and saving"):
-				st.markdown(_messages.message_filters)
+			download_table = st.sidebar.toggle("Download to Excel?")
+			if download_table == True:
+				with st.sidebar:
+					st.markdown(_messages.message_download)
+					download_file = _handlers.convert_to_excel(df.to_pandas())
 
-			with st.sidebar:
-				st.markdown(_messages.message_download)
-				download_file = _handlers.convert_to_excel(df)
-
-				st.download_button(
-					label="Download to Excel",
-					data=download_file,
-					file_name="keywords_tokens.xlsx",
-						mime="application/vnd.ms-excel",
-						)
+					st.download_button(
+						label="Download to Excel",
+						data=download_file,
+						file_name="keywords_tokens.xlsx",
+							mime="application/vnd.ms-excel",
+							)
 			st.sidebar.markdown("---")
 	
 		else:
@@ -139,64 +112,38 @@ def main():
 			tag_radio_tags = st.sidebar.radio("Select tags to display:", ("Parts-of-Speech", "DocuScope"), key = _handlers.persist("kt_radio3", pathlib.Path(__file__).stem, user_session_id), horizontal=True)
 	
 			if tag_radio_tags == 'Parts-of-Speech':
-				df = con.table("kt_pos", database="target").to_pandas()
+				df = st.session_state[user_session_id]["target"]["kt_pos"].filter(pl.col("Tag") != "FU")
 			else:
-				df = con.table("kt_ds", database="target").to_polars().filter(pl.col("Tag") != "Untagged").to_pandas()
-	
-			col1, col2 = st.columns([1,1])
-			with col1:
-				st.markdown(_messages.message_target_info(metadata_target))
-			with col2:
-				st.markdown(_messages.message_reference_info(metadata_reference))			
-		
-			gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
-			gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
-			gb.configure_column("Tag", filter="agTextColumnFilter", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly = True)
-			gb.configure_column("LL", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("LR", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=3)
-			gb.configure_column("PV", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=4)
-			gb.configure_column("RF", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("Range", type=["numericColumn","numberColumnFilter"], valueFormatter="(data.Range).toFixed(1)+'%'")
-			gb.configure_column("RF_Ref", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-			gb.configure_column("Range_Ref", type=["numericColumn","numberColumnFilter"], valueFormatter="(data.Range_Ref).toFixed(1)+'%'")
-			gb.configure_selection('multiple', use_checkbox=True, groupSelectsChildren="Group checkbox select children") #Enable multi-row selection
-			gb.configure_grid_options(sideBar = {"toolPanels": ['filters']})
-			go = gb.build()
-	
-			grid_response = st_aggrid.AgGrid(
-				df,
-				gridOptions=go,
-				enable_enterprise_modules = False,
-				data_return_mode='FILTERED_AND_SORTED', 
-				update_mode='MODEL_CHANGED', 
-				columns_auto_size_mode='FIT_CONTENTS',
-				theme='alpine',
-				height=500, 
-				width='100%',
-				reload_data=False
-				)
+				df = st.session_state[user_session_id]["target"]["kt_ds"].filter(pl.col("Tag") != "Untagged")
+			
+			if df.height == 0 or df is None:
+				cats = []
+			elif df.height > 0:
+				cats = sorted(df.get_column("Tag").unique().to_list())
+
+			filter_vals = st.multiselect("Select tags to filter:", (cats))
+			if len(filter_vals) > 0:
+				df = df.filter(pl.col("Tag").is_in(filter_vals))
+
+			st.dataframe(df, hide_index=True, 
+					column_config={
+						"Range": st.column_config.NumberColumn(format="%.2f %%"),
+						"Range_Ref": st.column_config.NumberColumn(format="%.2f %%"),
+						"RF": st.column_config.NumberColumn(format="%.2f"),
+						"RF_Ref": st.column_config.NumberColumn(format="%.2f")}
+			)
 			
 			with st.expander("Column explanation"):
 				st.markdown(_messages.message_columns_keyness)
-		
-			selected = grid_response['selected_rows']
-
-			if selected is not None:
-				df = pd.DataFrame(selected)
-				n_selected = len(df.index)
-				st.markdown(f"""##### Selected rows:
-				
-				Number of selected tokens: {n_selected}
-				""")
-
 				
 			st.sidebar.markdown("---")
 			st.sidebar.markdown(_messages.message_generate_plot)
 			
 			if st.sidebar.button('Plot resutls'):
-				df_plot = df[['Tag', 'RF', 'RF Ref']]
+				df_plot = df.to_pandas()
+				df_plot = df_plot[['Tag', 'RF', 'RF_Ref']]
 				df_plot['Mean'] = df_plot.mean(numeric_only=True, axis=1)
-				df_plot.rename(columns={'Tag': 'Tag', 'Mean': 'Mean', 'RF': 'Target', 'RF Ref': 'Reference'}, inplace = True)
+				df_plot.rename(columns={'Tag': 'Tag', 'Mean': 'Mean', 'RF': 'Target', 'RF_Ref': 'Reference'}, inplace = True)
 				df_plot = pd.melt(df_plot, id_vars=['Tag', 'Mean'],var_name='Corpus', value_name='RF')
 				df_plot.sort_values(by=['Mean', 'Corpus'], ascending=[True, True], inplace=True)
 					
@@ -213,20 +160,19 @@ def main():
 				
 				st.markdown(_messages.message_disable_full, unsafe_allow_html=True)
 				st.altair_chart(base, use_container_width=True)
-		
-			with st.sidebar.expander("Filtering and saving"):
-				st.markdown(_messages.message_filters)
-			
-			with st.sidebar:
-				st.markdown(_messages.message_download)
-				download_file = _handlers.convert_to_excel(df)
+					
+			download_table = st.sidebar.toggle("Download to Excel?")
+			if download_table == True:
+				with st.sidebar:
+					st.markdown(_messages.message_download)
+					download_file = _handlers.convert_to_excel(df.to_pandas())
 
-				st.download_button(
-					label="Download to Excel",
-					data=download_file,
-					file_name="keywords_tags.xlsx",
-						mime="application/vnd.ms-excel",
-						)
+					st.download_button(
+						label="Download to Excel",
+						data=download_file,
+						file_name="keywords_tags.xlsx",
+							mime="application/vnd.ms-excel",
+							)
 			st.sidebar.markdown("---")
 	
 	else:
@@ -244,33 +190,34 @@ def main():
 				with st.sidebar:
 					with st.spinner('Generating keywords...'):
 					
-						wc_tar_pos = con.table("ft_pos", database="target").to_pyarrow_batches(chunk_size=5000)
-						wc_tar_pos = pl.from_arrow(wc_tar_pos)
-						wc_tar_ds = con.table("ft_ds", database="target").to_pyarrow_batches(chunk_size=5000)
-						wc_tar_ds = pl.from_arrow(wc_tar_ds)
-						tc_tar_pos = con.table("tt_pos", database="target").to_polars()
-						tc_tar_ds = con.table("tt_ds", database="target").to_polars()
+						wc_tar_pos = st.session_state[user_session_id]["target"]["ft_pos"]
+						wc_tar_ds = st.session_state[user_session_id]["target"]["ft_ds"]
+						tc_tar_pos = st.session_state[user_session_id]["target"]["tt_pos"]
+						tc_tar_ds = st.session_state[user_session_id]["target"]["tt_ds"]
 
-						wc_ref_pos = con.table("ft_pos", database="reference").to_pyarrow_batches(chunk_size=5000)
-						wc_ref_pos = pl.from_arrow(wc_ref_pos)
-						wc_ref_ds = con.table("ft_ds", database="reference").to_pyarrow_batches(chunk_size=5000)
-						wc_ref_ds = pl.from_arrow(wc_ref_ds)
-						tc_ref_pos = con.table("tt_pos", database="reference").to_polars()
-						tc_ref_ds = con.table("tt_ds", database="reference").to_polars()
+						wc_ref_pos = st.session_state[user_session_id]["reference"]["ft_pos"]
+						wc_ref_ds = st.session_state[user_session_id]["reference"]["ft_ds"]
+						tc_ref_pos = st.session_state[user_session_id]["reference"]["tt_pos"]
+						tc_ref_ds = st.session_state[user_session_id]["reference"]["tt_ds"]
 						
 						kw_pos = _analysis.keyness_pl(wc_tar_pos, wc_ref_pos)
-						kw_pos = ibis.memtable(kw_pos)
 						kw_ds  = _analysis.keyness_pl(wc_tar_ds, wc_ref_ds)
-						kw_ds = ibis.memtable(kw_ds)
 						kt_pos = _analysis.keyness_pl(tc_tar_pos, tc_ref_pos, tags_only=True)
 						kt_ds  = _analysis.keyness_pl(tc_tar_ds, tc_ref_ds, tags_only=True)
 
-						con.create_table("kw_pos", obj=kw_pos, database="target", overwrite=True)
-						con.create_table("kw_ds", obj=kw_ds, database="target", overwrite=True)
-						con.create_table("kt_pos", obj=kt_pos, database="target", overwrite=True)
-						con.create_table("kt_ds", obj=kt_ds, database="target", overwrite=True)
-
-						_handlers.update_session('keyness_table', True, con)
+						if "kw_pos" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["kw_pos"] = {}
+						st.session_state[user_session_id]["target"]["kw_pos"] = kw_pos
+						if "kw_ds" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["kw_ds"] = {}
+						st.session_state[user_session_id]["target"]["kw_ds"] = kw_ds
+						if "kt_pos" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["kt_pos"] = {}
+						st.session_state[user_session_id]["target"]["kt_pos"] = kt_pos
+						if "kt_ds" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["kt_ds"] = {}
+						st.session_state[user_session_id]["target"]["kt_ds"] = kt_ds
+						_handlers.update_session('keyness_table', True, user_session_id)
 						st.success('Keywords generated!')
 						st.rerun()
 		

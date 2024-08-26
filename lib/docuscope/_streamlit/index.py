@@ -21,15 +21,12 @@ import sys
 import textwrap
 import warnings
 
-from docuscope._streamlit import states as _states
 from docuscope._streamlit import utilities
 from docuscope._streamlit import apps as _stable_apps
 from docuscope._streamlit import categories as _categories
-from docuscope._streamlit.utilities import handlers_database as _handlers
 from docuscope._streamlit.utilities import content as _content
 from docuscope._streamlit.utilities import messages as _messages
 from docuscope._version import __version__
-
 
 HERE = pathlib.Path(__file__).parent.resolve()
 FAVICON = str(HERE.joinpath("_static/docuscope-favicon.ico"))
@@ -39,13 +36,14 @@ UG_LOGO = str(HERE.joinpath("_static/user_guide.svg"))
 STYLE = str(HERE.joinpath("css/style.css"))
 SPACY_META = HERE.joinpath("models/en_docusco_spacy/meta.json")
 
+st.set_page_config(page_title="DocuScope CAC", page_icon=FAVICON, layout="wide")
+_content.local_css(STYLE)
+
 user_session = st.runtime.scriptrunner.script_run_context.get_script_run_ctx()
 user_session_id = user_session.session_id
 
 if user_session_id not in st.session_state:
     st.session_state[user_session_id] = {}
-
-con = _handlers.get_db_connection(user_session_id)
 
 def index(application_options):
     if not sys.warnoptions:
@@ -117,7 +115,7 @@ def index(application_options):
 def main():
     if not sys.warnoptions:
         warnings.simplefilter("ignore")
-        
+
     session_state = utilities.session_state(app=_content.get_url_app())
 
     stable_apps = _content._get_apps_from_module(_stable_apps)
@@ -127,8 +125,7 @@ def main():
         item
         for item in application_options.items()
     ]
-
-    st.set_page_config(page_title="DocuScope CAC", page_icon=FAVICON, layout="wide")
+    
     _content.local_css(STYLE)
     
     if (

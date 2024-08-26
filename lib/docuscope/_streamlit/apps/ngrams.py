@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
 import polars as pl
-import st_aggrid
 import streamlit as st
 
 from docuscope._streamlit import categories as _categories
-from docuscope._streamlit import states as _states
 from docuscope._streamlit.utilities import analysis_functions as _analysis
 from docuscope._streamlit.utilities import handlers_database as _handlers
 from docuscope._streamlit.utilities import messages as _messages
@@ -36,76 +33,73 @@ def main():
 	if user_session_id not in st.session_state:
 		st.session_state[user_session_id] = {}
 	try:
-		con = st.session_state[user_session_id]["ibis_conn"]
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 	except:
-		con = _handlers.get_db_connection(user_session_id)
-		_handlers.generate_temp(_states.STATES.items(), user_session_id, con)
-	
-	try:
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
-	except:
-		_handlers.init_session(con)
-		session = pl.DataFrame.to_dict(con.table("session").to_polars(), as_series=False)
-
+		_handlers.init_session(user_session_id)
+		session = pl.DataFrame.to_dict(st.session_state[user_session_id]["session"], as_series=False)
 
 	if session.get('ngrams')[0] == True:
 		
-		metadata_target = _handlers.load_metadata('target', con)
+		metadata_target = _handlers.load_metadata('target', user_session_id)
 		
-		df = con.table("ngrams", database="target").to_pyarrow_batches(chunk_size=5000)
-		df = pl.from_arrow(df).to_pandas()
+		df = st.session_state[user_session_id]["target"]["ngrams"]
 	
 		st.markdown(_messages.message_target_info(metadata_target))
-			
-		gb = st_aggrid.GridOptionsBuilder.from_dataframe(df)
-		gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=100) #Add pagination
-		gb.configure_default_column(filter="agTextColumnFilter")
-		gb.configure_column("Token_1", filter="agTextColumnFilter", headerCheckboxSelection = True, headerCheckboxSelectionFilteredOnly = True)
-		gb.configure_column("RF", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2)
-		gb.configure_column("Range", type=["numericColumn","numberColumnFilter"], valueFormatter="(data.Range).toFixed(1)+'%'")
-		gb.configure_selection('multiple', use_checkbox=True, groupSelectsChildren="Group checkbox select children") #Enable multi-row selection
-		gb.configure_grid_options(sideBar = {"toolPanels": ['filters']})
-		go = gb.build()
 		
-		grid_response = st_aggrid.AgGrid(
-			df,
-			gridOptions=go,
-			enable_enterprise_modules = False,
-			data_return_mode='FILTERED_AND_SORTED', 
-			update_mode='MODEL_CHANGED', 
-			columns_auto_size_mode='FIT_CONTENTS',
-			theme='alpine',
-			height=500, 
-			width='100%',
-			reload_data=False
-			)
-			
-		with st.expander("Column explanation"):
-			st.markdown(_messages.message_columns_tokens)
-			
-		selected = grid_response['selected_rows']
-		
-		if selected is not None:
-			df = pd.DataFrame(selected)
-			n_selected = len(df.index)
-			st.markdown(f"""##### Selected rows:
-			   
-			Number of selected tokens: {n_selected}
-			""")
+		col1, col2 = st.columns(2)
 
-		with st.sidebar.expander("Filtering and saving"):
-			st.markdown(_messages.message_filters)
-		
-		with st.sidebar:
-			st.markdown(_messages.message_download)
-			download_file = _handlers.convert_to_excel(df)
+		with col1:
+			if df.height == 0 or df is None:
+				cats_1 = []
+			elif df.height > 0:
+				cats_1 = sorted(df.get_column("Tag_1").drop_nulls().unique().to_list())
 
-			st.download_button(
-    			label="Download to Excel",
-    			data=download_file,
-    			file_name="ngrams.xlsx",
-   					 mime="application/vnd.ms-excel",
-					)
+			filter_tag_1 = st.multiselect("Select tags to filter in position 1:", (cats_1))
+			if len(filter_tag_1) > 0:
+				df = df.filter(pl.col("Tag_1").is_in(filter_tag_1))
+
+			if "Tag_3" in df.columns:
+				cats_3 = sorted(df.get_column("Tag_3").drop_nulls().unique().to_list())
+				filter_tag_3 = st.multiselect("Select tags to filter in position 3:", (cats_3))
+				if len(filter_tag_3) > 0:
+					df = df.filter(pl.col("Tag_3").is_in(filter_tag_3))
+		
+		with col2:
+			if df.height == 0 or df is None:
+				cats_2 = []
+			elif df.height > 0:
+				cats_2 = sorted(df.get_column("Tag_2").drop_nulls().unique().to_list())
+
+			filter_tag_2 = st.multiselect("Select tags to filter in position 2:", (cats_2))
+			if len(filter_tag_2) > 0:
+				df = df.filter(pl.col("Tag_2").is_in(filter_tag_2))
+
+			if "Tag_4" in df.columns:
+				cats_4 = sorted(df.get_column("Tag_4").drop_nulls().unique().to_list())
+				filter_tag_4 = st.multiselect("Select tags to filter in position 4:", (cats_4))
+				if len(filter_tag_4) > 0:
+					df = df.filter(pl.col("Tag_4").is_in(filter_tag_4))
+
+
+		st.dataframe(df, hide_index=True, 
+				column_config={
+					"Range": st.column_config.NumberColumn(format="%.2f %%"),
+					"RF": st.column_config.NumberColumn(format="%.2f")}
+		)
+		
+		download_table = st.sidebar.toggle("Download to Excel?")
+		if download_table == True:
+			with st.sidebar:
+				st.sidebar.markdown(_messages.message_download)
+				download_file = _handlers.convert_to_excel(df.to_pandas())
+
+				st.download_button(
+					label="Download to Excel",
+					data=download_file,
+					file_name="ngrams.xlsx",
+						mime="application/vnd.ms-excel",
+						)
+
 		st.sidebar.markdown("---")
 
 		st.sidebar.markdown("### Generate new table")
@@ -114,11 +108,9 @@ def main():
 							""")
 	
 		if st.sidebar.button("Create a New Ngrams Table"):
-			try:
-				con.drop_table("ngrams", database="target")
-			except:
-				pass
-			_handlers.update_session('ngrams', False, con)
+			if "ngrams" not in st.session_state[user_session_id]["target"]:
+				st.session_state[user_session_id]["target"]["ngrams"] = {}
+			_handlers.update_session('ngrams', False, user_session_id)
 			st.rerun()
 		st.sidebar.markdown("---")
 			
@@ -162,17 +154,17 @@ def main():
 				else:
 					with st.sidebar:
 						with st.spinner('Processing n-grams...'):
-							tok_pl = con.table("ds_tokens", database="target").to_pyarrow_batches(chunk_size=5000)
-							tok_pl = pl.from_arrow(tok_pl)
-							
+							tok_pl = st.session_state[user_session_id]["target"]["ds_tokens"]
 							ngram_df = _analysis.ngrams_pl(tok_pl, ngram_span, count_by=ts)
 					
 					#cap size of dataframe
 					if ngram_df.height < 2:
 						st.markdown(_warnings.warning_12, unsafe_allow_html=True)
 					else:
-						con.create_table("ngrams", obj=ngram_df, database="target", overwrite=True)
-						_handlers.update_session('ngrams', True, con)
+						if "ngrams" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["ngrams"] = {}
+						st.session_state[user_session_id]["target"]["ngrams"] = ngram_df
+						_handlers.update_session('ngrams', True, user_session_id)
 						st.rerun()
 
 			
@@ -245,8 +237,7 @@ def main():
 				else:
 					with st.sidebar:
 						with st.spinner('Processing n-grams...'):
-							tok_pl = con.table("ds_tokens", database="target").to_pyarrow_batches(chunk_size=5000)
-							tok_pl = pl.from_arrow(tok_pl)
+							tok_pl = st.session_state[user_session_id]["target"]["ds_tokens"]
 
 							if from_anchor == 'Token':
 								ngram_df = _analysis.ngrams_by_token_pl(tok_pl, node_word, position, ngram_span, search, ts)
@@ -260,8 +251,10 @@ def main():
 					elif ngram_df.height > 100000:
 						st.markdown(_warnings.warning_13, unsafe_allow_html=True)
 					else:
-						con.create_table("ngrams", obj=ngram_df, database="target", overwrite=True)
-						_handlers.update_session('ngrams', True, con)
+						if "ngrams" not in st.session_state[user_session_id]["target"]:
+							st.session_state[user_session_id]["target"]["ngrams"] = {}
+						st.session_state[user_session_id]["target"]["ngrams"] = ngram_df
+						_handlers.update_session('ngrams', True, user_session_id)
 						st.rerun()
 					
 			st.sidebar.markdown("---")
