@@ -24,8 +24,6 @@ Current version: v0.3.2.
 
 [Download DocuScope CAC for Windows (.exe)][windows]
 
-[Download DocuScope CAC for macOS M-series (.dmg)][mac-arm64]
-
 [Download DocuScope CAC for macOS Intel (.dmg)][mac-intel]
 
 ### Build from Source
