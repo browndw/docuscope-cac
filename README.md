@@ -67,7 +67,7 @@ See [LICENSE][license-url].
 [node-js]: https://nodejs.org/en/
 
 [mac-intel]: https://github.com/browndw/docuscope-cac/releases/download/v0.3.2/DocuScope.CAC-0.3.2.dmg
-[mac-arm64]: https://github.com/browndw/docuscope-cac/releases/download/v0.3.2/DocuScope.CAC-0.3.2-arm64.dmg
+[mac-arm64]: https://github.com/browndw/docuscope-cac/releases/download/v0.3.2/DocuScope.CAC-0.3.2-mac-arm64.dmg
 [windows]: https://github.com/browndw/docuscope-cac/releases/download/v0.3.2/DocuScope.CAC.Setup.0.3.2.exe
 
 [license-image]: https://img.shields.io/badge/license-Apache2-blue.svg
